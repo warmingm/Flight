@@ -1,0 +1,216 @@
+package flight.assist;
+
+import flight.assist.*;
+
+import javax.swing.*;
+import java.io.*;
+import java.sql.*;
+
+public class SeatInfo {
+  DataBaseManager dbManager = DataBaseManager.getInstance();
+  public SeatInfo() {
+  }
+
+  //判断航班是否已满
+  public boolean isFull(String flightNum, String day) {
+    String sqlString = "select orderedSeats from orderedSeats where flight='" +
+        flightNum +
+        "' and flightdate='" + day + "'";
+    ResultSet rs = dbManager.getResult(sqlString);
+    try {
+      if (!rs.next()) {
+        sqlString = "insert into orderedSeats values('" + flightNum + "','" +
+            day + "',0)";
+        dbManager.updateSql(sqlString);
+        return false;
+      }
+      else {
+        int orderSeats = rs.getInt(1);
+        sqlString = "select seat from flight where flight='" + flightNum + "'";
+        rs = dbManager.getResult(sqlString);
+        int totalSeats = 0;
+        if (rs.next())
+          totalSeats = rs.getInt(1);
+        if (totalSeats == orderSeats)
+          return true;
+        else
+          return false;
+      }
+    }
+    catch (Exception e) {
+      e.printStackTrace();
+      return false;
+    }
+  }
+
+  public int dingPiao(String flightNum, String day, int seats) {
+    int leftSeats = 0;
+
+    String sql = "select orderedSeats from orderedSeats where flight='" +
+        flightNum +
+        "' and flightdate='" + day + "'";
+    ResultSet rs = dbManager.getResult(sql);
+    int bookedSeats = 0;
+    try {
+      if (rs.next()) {
+        bookedSeats = rs.getInt(1);
+      }
+      else {
+        JOptionPane.showMessageDialog(null, "航班信息尚未录入!",
+                                      "错误信息", JOptionPane.ERROR_MESSAGE);
+      }
+    }catch (Exception e) {
+      e.printStackTrace();
+    }
+    String sqlString = "select seat,week from flight where flight='" +
+        flightNum + "' ";
+    rs = dbManager.getResult(sqlString);
+    int totalSeats = 0;
+    String week = "";
+    try {
+      while (rs.next()) {
+        totalSeats = rs.getInt(1);
+        week = rs.getString(2);
+      }
+    }catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    String c = isAbsence(day);
+    int flag = 0;
+    for (int i = 0; i < week.length(); i++) {
+      String w = week.substring(i, i + 1);
+      if (c.equals(w)) {
+        flag = 1;
+        break;
+      }
+    }
+
+    if (flag == 1) {
+      leftSeats = totalSeats - bookedSeats;
+
+      if (leftSeats >= seats) {
+        sql = "update orderedSeats set orderedSeats=" + (bookedSeats + seats) +
+            "where flight='" + flightNum +
+            "' and flightdate='" + day + "'";
+        dbManager.updateSql(sql);
+        return -1;
+      }
+      else
+        return leftSeats;
+    }
+    else
+      return -2;
+  }
+
+  public void tuiPiao(String flightNum, String day, int seats) {
+    String sql = "select orderedSeats from orderedSeats where flight='" +
+        flightNum +
+        "' and flightdate='" + day + "'";
+    System.out.println(sql);
+    ResultSet rs = dbManager.getResult(sql);
+    int bookedSeats = 0;
+    try {
+      if (rs.next()) {
+        bookedSeats = rs.getInt(1);
+        System.out.println(bookedSeats);
+      }
+      else {
+        JOptionPane.showMessageDialog(null, "航班信息尚未录入!",
+                                      "错误信息", JOptionPane.ERROR_MESSAGE);
+      }
+    }
+    catch (Exception e) {
+      e.printStackTrace();
+    }
+    if (bookedSeats < seats)
+      JOptionPane.showMessageDialog(null, "退票数大于已定票数!",
+                                    "错误信息", JOptionPane.ERROR_MESSAGE);
+    else {
+      sql = "update orderedSeats set orderedSeats=" + (bookedSeats - seats) +
+          "where flight='" + flightNum +
+          "' and flightdate='" + day + "'";
+      dbManager.updateSql(sql);
+    }
+  }
+
+  private String timeToWeek(String year, String month, String day) {
+    int sum = 0;
+    int y = Integer.parseInt(year);
+    int m = Integer.parseInt(month);
+    int d = Integer.parseInt(day);
+
+    int[] dayOfMonth = {
+        0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+
+    //Caculate the first the day of the designate year is "Xing Qi Ji"
+    int firstDayOfYear = firstDay(y);
+
+    for (int i = 1; i < m; i++) {
+      sum = sum + dayOfMonth[i];
+    }
+
+    sum = sum + (d - 1) + firstDayOfYear;
+
+    //If month is over February and the designate year is leap year,
+    //the total days should be add one
+    if ( (m >= 2) && ( (y % 4 == 0 && y % 100 != 0) || (y % 400 == 0)))
+      sum++;
+
+    int week = 0;
+    //The weekday for the designate day is:
+    int x = sum % 7;
+    switch (x) {
+      case 1:
+        week = 1;
+        break;
+      case 2:
+        week = 2;
+        break;
+      case 3:
+        week = 3;
+        break;
+      case 4:
+        week = 4;
+        break;
+      case 5:
+        week = 5;
+        break;
+      case 6:
+        week = 6;
+        break;
+      case 0:
+        week = 7;
+        break;
+    }
+
+    return String.valueOf(week);
+  }
+
+//The method used to caculate the first the day of the designate year is "Xing Qi Ji"
+  private int firstDay(int year) {
+    int a, b;
+
+    if (year <= 2000) {
+      a = 2000 - year;
+      b = 6 - (a + a / 4 - a / 100 + a / 400) % 7;
+      return b;
+    }
+    else {
+      a = year - 2000;
+      b = (a + 1 + (a - 1) / 4 - (a - 1) / 100 + (a - 1) / 400) % 7 + 6;
+      return b % 7;
+    }
+  }
+
+  private String isAbsence(String date) {
+    String year = date.substring(0, 4);
+    String month = date.substring(4, 6);
+    String day = date.substring(6, 8);
+
+    String week = timeToWeek(year, month, day);
+
+    return week;
+
+  }
+  }

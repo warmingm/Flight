@@ -1,0 +1,124 @@
+package flight.Main;
+
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+
+import flight.manage.*;
+import flight.query.*;
+import flight.ticketbook.*;
+import flight.ticketrefund.*;
+
+class Interface
+    extends JPanel
+    implements ActionListener {
+  private TicketRefund ticketRefund;
+  private TicketBook ticketBook;
+
+  private JButton jbQuery = new JButton("查询");
+  private JButton jbManager = new JButton("管理");
+  private JButton jbTicketBook = new JButton("订票");
+  private JButton jbTicketRefund = new JButton("退票");
+  private JButton jbAbout = new JButton("关于");
+
+  public Interface() {
+    this.setLayout(null);
+    this.add(jbQuery);
+    this.add(jbTicketBook);
+    this.add(jbTicketRefund);
+    this.add(jbManager);
+    this.add(jbAbout);
+
+    jbQuery.setFont(new Font("Times", Font.PLAIN, 12));
+    jbTicketBook.setFont(new Font("Times", Font.PLAIN, 12));
+    jbTicketRefund.setFont(new Font("Times", Font.PLAIN, 12));
+    jbManager.setFont(new Font("Times", Font.PLAIN, 12));
+    jbAbout.setFont(new Font("Times", Font.PLAIN, 12));
+
+    jbQuery.setBounds(90, 280, 80, 30);
+    jbTicketBook.setBounds(190, 280, 80, 30);
+    jbTicketRefund.setBounds(290, 280, 80, 30);
+    jbManager.setBounds(390, 280, 80, 30);
+    jbAbout.setBounds(430, 350, 80, 30);
+
+    jbQuery.addActionListener(this);
+    jbManager.addActionListener(this);
+    jbTicketBook.addActionListener(this);
+    jbTicketRefund.addActionListener(this);
+    jbAbout.addActionListener(this);
+  }
+
+  public void paintComponent(Graphics g) {
+    ImageIcon imageIcon = new ImageIcon("backgrond.gif");
+    Image image = imageIcon.getImage();
+
+    g.drawImage(image, 0, 0, this);
+  }
+
+  public void actionPerformed(ActionEvent e) {
+    if (e.getSource() == jbQuery) {
+      Query query = new Query();
+      Dimension d = Toolkit.getDefaultToolkit().getScreenSize(); //屏幕大小
+      query.setLocation( (d.width - query.getSize().width) / 2,
+                          (d.height - query.getSize().height) / 2);
+      query.show();
+    }
+
+    else if (e.getSource() == jbManager) {
+      String id = JOptionPane.showInputDialog(null, "请输入你的帐号:",
+                                              "帐号验证", JOptionPane.PLAIN_MESSAGE);
+      if (id == null)
+        return;
+      if (!id.equals("manage")) {
+        JOptionPane.showMessageDialog(null, "对不起!你的帐号不正确!",
+                                      "帐号错误", JOptionPane.ERROR_MESSAGE);
+        return;
+      }
+
+      String password = JOptionPane.showInputDialog(null, "请输入你的密码:",
+          "密码验证", JOptionPane.PLAIN_MESSAGE);
+      if (password == null)
+        return;
+      if (!password.equals("manage")) {
+        JOptionPane.showMessageDialog(null, "对不起!你的密码不正确!",
+                                      "帐号错误", JOptionPane.ERROR_MESSAGE);
+        return;
+      }
+
+      Management manager = new Management();
+      Dimension d = Toolkit.getDefaultToolkit().getScreenSize();//屏幕大小
+      manager.setLocation( (d.width - manager.getSize().width) / 2,
+                      (d.height - manager.getSize().height) / 2);
+      manager.show();
+    }
+
+    else if (e.getSource() == jbTicketBook) {
+      ticketBook = new TicketBook();
+      Dimension d = Toolkit.getDefaultToolkit().getScreenSize(); //屏幕大小
+      ticketBook.setLocation( (d.width - ticketBook.getSize().width) / 2,
+                          (d.height - ticketBook.getSize().height) / 2);
+      ticketBook.show();
+
+    }
+
+    else if (e.getSource() == jbTicketRefund) {
+      ticketRefund = new TicketRefund();
+
+      ticketRefund.setSize(470, 370);
+      ticketRefund.setResizable(false);
+      ticketRefund.setTitle("航班退票系统");
+      ticketRefund.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+      ticketRefund.setVisible(true);
+    }
+
+    else if (e.getSource() == jbAbout) {
+      String information = "制作人:" + "  吴海贤 陈振 孟磊 余菁" + "\n" +
+          "版本: " + "     1.2" + "\n" +
+          "时间: " + "     2004-12" + "\n" +
+          "地址: " + "     哈尔滨工业大学软件学院03级2班";
+
+      JOptionPane.showMessageDialog(null, information, "关于",
+                                    JOptionPane.INFORMATION_MESSAGE);
+    }
+  }
+}

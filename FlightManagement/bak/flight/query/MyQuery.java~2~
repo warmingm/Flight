@@ -1,0 +1,142 @@
+//:MyQuery.java
+/**
+ *The programme used to realized query function module for the "Plane Query and Ticket_Book System"
+ *@author HaiXian Wu in Software College Grade 2003 Class 2  ID:1033710201
+ *@version 1.0
+ *Start Time:2004-12-21
+ *End Time  :2004-12-25
+ */
+package flight.query;
+
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+import javax.swing.border.*;
+
+public class MyQuery
+    extends JFrame
+    implements ActionListener, WindowListener {
+  /*private FlightQuery flightQ = new FlightQuery();
+    private AirFirmQuery airfirmQ = new AirFirmQuery();
+    private DestinQuery desQ= new DestinQuery();
+    private ComprehenQuery comQ= new ComprehenQuery();
+
+    private JButton jbFlight,jbAirFirm,jbDestination,jbComprehen,jbExit;
+    private JPanel jpQuery = new JPanel();
+    private CardLayout card;*/
+
+  public MyQuery() {
+    /*
+       JPanel jp1 = new JPanel();
+       jp1.add(jbFlight = new JButton("  航 班 查 询  "));
+
+       JPanel jp2 = new JPanel();
+       jp2.add(jbAirFirm = new JButton("航空公司查询"));
+
+       JPanel jp3 = new JPanel();
+       jp3.add(jbDestination = new JButton("目 的 地 查 询"));
+
+       JPanel jp4 = new JPanel();
+       jp4.add(jbComprehen = new JButton("  综 合 查 询   "));
+
+       JPanel jp5 = new JPanel();
+       jp5.add(jbExit = new JButton("     退    出      "));
+
+       JPanel jpButtons = new JPanel();
+       jpButtons.setLayout(new GridLayout(5,1));
+       jpButtons.add(jp1);
+       jpButtons.add(jp2);
+       jpButtons.add(jp3);
+       jpButtons.add(jp4);
+       jpButtons.add(jp5);
+
+       //Use cardLayout manager
+       card = new CardLayout();
+       jpQuery.setLayout(card);
+       jpQuery.add("flight",flightQ);
+       jpQuery.add("airfirm",airfirmQ);
+       jpQuery.add("destination",desQ);
+       jpQuery.add("comprehen",comQ);
+
+       JPanel jp = new JPanel();
+       jp.setLayout(new BorderLayout());
+       jp.setBorder(new MatteBorder(new ImageIcon("f.gif")));
+       jp.add(jpButtons,BorderLayout.WEST);
+       jp.add(jpQuery,BorderLayout.CENTER);
+
+       Container c = getContentPane();
+       c.add(jp);
+
+       jbFlight.addActionListener(this);
+       jbAirFirm.addActionListener(this);
+       jbDestination.addActionListener(this);
+       jbComprehen.addActionListener(this);
+       jbExit.addActionListener(this);*/
+
+    JTabbedPane jtp = new JTabbedPane();
+    jtp.add(" 普 通 查 询 ", new CommonQuery());
+    jtp.add(" 综 合 查 询", new ComprehenQuery());
+
+    jtp.setBorder(new MatteBorder(new ImageIcon("f.gif")));
+    this.getContentPane().add(jtp);
+
+    this.addWindowListener(new WindowAdapter() {
+      public void windowClosing(WindowEvent e) {
+        MyQuery.this.setVisible(false);
+        MyQuery.this.dispose();
+      }
+    }
+    );
+  }
+
+  public void actionPerformed(ActionEvent e) {
+    /*	if (e.getSource() == jbFlight)
+        card.show(jpQuery,"flight");
+     else if (e.getSource() == jbAirFirm)
+        card.show(jpQuery,"airfirm");
+     else if (e.getSource() == jbDestination)
+        card.show(jpQuery,"destination");
+     else if (e.getSource() == jbComprehen)
+        card.show(jpQuery,"comprehen");
+     else if (e.getSource() == jbExit)
+     {
+      closeDataBase();
+      this.setVisible(false);
+      this.dispose();
+     } 		*/
+  }
+
+  //Realize the abstract methods of the WindowListener
+
+  public void windowClosing(WindowEvent e) {
+    closeDataBase();
+  }
+
+  //When exit the program,the database should be closed
+  //to avoid engross the resourse of the computer!
+  public void closeDataBase() {
+    FlightQuery.sqlBean.CloseDataBase();
+    AirFirmQuery.sqlBean.CloseDataBase();
+    DestinQuery.sqlBean.CloseDataBase();
+    ComprehenQuery.sqlBean.CloseDataBase();
+  }
+
+  public void windowClosed(WindowEvent e) {
+  }
+
+  public void windowOpened(WindowEvent e) {
+  }
+
+  public void windowIconified(WindowEvent e) {
+  }
+
+  public void windowDeiconified(WindowEvent e) {
+  }
+
+  public void windowDeactivated(WindowEvent e) {
+  }
+
+  public void windowActivated(WindowEvent e) {
+  }
+
+} ///:~
